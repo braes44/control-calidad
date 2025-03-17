@@ -4,229 +4,450 @@
     <meta charset="UTF-8">
     <title>Control de Calidad - Ingreso y Gráficos</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        input { width: 60px; text-align: center; }
-        button { padding: 10px; margin: 5px; }
-        #resultados { margin-top: 20px; }
-        .limit-input { width: 80px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7fa;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        input[type="text"], input[type="datetime-local"], input[type="number"], select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        input[type="number"] {
+            width: 60px;
+        }
+        input[type="text"], input[type="datetime-local"] {
+            width: 150px;
+        }
+        select {
+            width: 100px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #e9ecef;
+            color: #333;
+        }
+        td {
+            background-color: #fff;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .result-header {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .result-header p {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #555;
+        }
+        #analisis {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+        canvas {
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Control de Calidad - Tabletas Recubiertas</h1>
+    <div class="container">
+        <h1>Control de Calidad - Tabletas Recubiertas</h1>
 
-    <!-- Configuración de Límites de Especificación -->
-    <h2>Límites de Especificación</h2>
-    <label>Límite Superior (LES): <input type="number" id="les" value="116" class="limit-input"></label>
-    <label>Límite Inferior (LEI): <input type="number" id="lei" value="107" class="limit-input"></label>
+        <!-- Configuración General -->
+        <div class="section">
+            <h2>Configuración General</h2>
+            <div class="form-group">
+                <label>Título de Datos: <input type="text" id="tituloDatos" value="Ingresar Datos de Peso (mg)"></label>
+                <label>Analista: <input type="text" id="analista" placeholder="Nombre del analista"></label>
+                <label>Lote: <input type="text" id="lote" placeholder="Nombre del lote"></label>
+                <label>Hora Inicio: <input type="datetime-local" id="horaInicio"></label>
+                <label>Hora Final: <input type="datetime-local" id="horaFinal"></label>
+            </div>
+        </div>
 
-    <!-- Nivel de Confianza -->
-    <h2>Nivel de Confianza para Intervalos</h2>
-    <label>Elegir nivel de confianza: 
-        <select id="confidenceLevel">
-            <option value="90">90%</option>
-            <option value="95" selected>95%</option>
-            <option value="99">99%</option>
-        </select>
-    </label>
+        <!-- Límites de Especificación y Nivel de Confianza -->
+        <div class="section">
+            <h2>Parámetros de Control</h2>
+            <div class="form-group">
+                <label>Límite Superior (LES): <input type="number" id="les" value="116"></label>
+                <label>Límite Inferior (LEI): <input type="number" id="lei" value="107"></label>
+                <label>Nivel de Confianza: 
+                    <select id="confidenceLevel">
+                        <option value="90">90%</option>
+                        <option value="95" selected>95%</option>
+                        <option value="99">99%</option>
+                    </select>
+                </label>
+            </div>
+        </div>
 
-    <!-- Sección de Ingreso de Datos -->
-    <h2>Ingresar Datos de Peso (mg)</h2>
-    <table id="tablaPeso">
-        <thead>
-            <tr>
-                <th>Muestra</th>
-                <th>Lote 1</th>
-                <th>Lote 2</th>
-                <th>Lote 3</th>
-            </tr>
-        </thead>
-        <tbody id="tablaBody">
-            <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <!-- Inicialmente 10 filas -->
-            <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>4</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>5</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>6</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>7</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>8</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>9</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-            <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-        </tbody>
-    </table>
-    <button onclick="agregarFila()">Agregar Muestra</button>
-    <label><input type="checkbox" id="mostrarLimites" checked> Mostrar Límites de Control en el Gráfico</label>
-    <br>
-    <button onclick="calcularEstadisticas()">Calcular y Graficar</button>
+        <!-- Secciones Dinámicas de Ingreso de Datos -->
+        <div id="seccionesDatos"></div>
+        <div class="section" style="text-align: center;">
+            <button onclick="agregarSeccion()">Agregar Nueva Sección de Datos</button>
+        </div>
 
-    <!-- Resultados -->
-    <div id="resultados">
-        <h2>Resultados</h2>
-        <table id="tablaResultados">
-            <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
-            <tr><td>Promedio</td><td id="avg1"></td><td id="avg2"></td><td id="avg3"></td></tr>
-            <tr><td>Desv. Est.</td><td id="std1"></td><td id="std2"></td><td id="std3"></td></tr>
-            <tr><td>Rango</td><td id="range1"></td><td id="range2"></td><td id="range3"></td></tr>
-            <tr><td>Máximo</td><td id="max1"></td><td id="max2"></td><td id="max3"></td></tr>
-            <tr><td>Mínimo</td><td id="min1"></td><td id="min2"></td><td id="min3"></td></tr>
-            <tr><td>LCS</td><td id="lcs1"></td><td id="lcs2"></td><td id="lcs3"></td></tr>
-            <tr><td>LCI</td><td id="lci1"></td><td id="lci2"></td><td id="lci3"></td></tr>
-            <tr><td>Intervalo Confianza Sup.</td><td id="confSup1"></td><td id="confSup2"></td><td id="confSup3"></td></tr>
-            <tr><td>Intervalo Confianza Inf.</td><td id="confInf1"></td><td id="confInf2"></td><td id="confInf3"></td></tr>
-            <tr><td>Cp</td><td id="cp1"></td><td id="cp2"></td><td id="cp3"></td></tr>
-            <tr><td>Cpk Sup</td><td id="cpkSup1"></td><td id="cpkSup2"></td><td id="cpkSup3"></td></tr>
-            <tr><td>Cpk Inf</td><td id="cpkInf1"></td><td id="cpkInf2"></td><td id="cpkInf3"></td></tr>
-        </table>
+        <!-- Botón de Cálculo -->
+        <div class="section" style="text-align: center;">
+            <button onclick="calcularEstadisticas()">Calcular y Graficar</button>
+        </div>
+
+        <!-- Resultados -->
+        <div class="section" id="resultados">
+            <h2>Informe de Resultados</h2>
+            <div class="result-header">
+                <p>Analista: <span id="analistaRes"></span></p>
+                <p>Lote: <span id="loteRes"></span></p>
+                <p>Hora Inicio: <span id="horaInicioRes"></span></p>
+                <p>Hora Final: <span id="horaFinalRes"></span></p>
+            </div>
+            <div id="tablasResultados"></div>
+            <h3>Análisis de las Gráficas</h3>
+            <textarea id="analisis" placeholder="Escribe tu análisis de las gráficas aquí..."></textarea>
+        </div>
+
+        <!-- Gráficas -->
+        <div id="seccionesGraficos"></div>
     </div>
 
-    <!-- Gráfico -->
-    <h2>Gráfico de Pesos</h2>
-    <canvas id="graficoPeso" width="400" height="200"></canvas>
-
     <script>
-        let chart;
-        let numMuestras = 10;
+        let chartInstances = {};
+        let numSecciones = 0;
 
-        function agregarFila() {
-            numMuestras++;
-            const tbody = document.getElementById('tablaBody');
+        function agregarSeccion() {
+            numSecciones++;
+            const seccionId = `seccion${numSecciones}`;
+            const tablaId = `tablaPeso${numSecciones}`;
+            const bodyId = `tablaBody${numSecciones}`;
+            const graficoId = `graficoPeso${numSecciones}`;
+            const mostrarLimitesId = `mostrarLimites${numSecciones}`;
+            const tituloDatosId = `tituloDatos${numSecciones}`;
+            const tituloGraficoId = `tituloGrafico${numSecciones}H2`;
+            const tituloTablaId = `tituloTabla${numSecciones}H3`;
+            const inputTituloDatosId = `inputTituloDatos${numSecciones}`;
+            const inputTituloGraficoId = `inputTituloGrafico${numSecciones}`;
+            const inputTituloTablaId = `inputTituloTabla${numSecciones}`;
+
+            // Crear sección de ingreso de datos
+            const seccionHTML = `
+                <div class="section" id="${seccionId}">
+                    <div class="form-group">
+                        <label>Título de Datos: <input type="text" id="${inputTituloDatosId}" value="Ingresar Datos ${numSecciones}"></label>
+                        <label>Título Gráfico: <input type="text" id="${inputTituloGraficoId}" value="Gráfico ${numSecciones}"></label>
+                        <label>Título Tabla: <input type="text" id="${inputTituloTablaId}" value="Resultados ${numSecciones}"></label>
+                    </div>
+                    <h2 id="${tituloDatosId}">Ingresar Datos ${numSecciones}</h2>
+                    <table id="${tablaId}">
+                        <thead>
+                            <tr>
+                                <th>Muestra</th>
+                                <th>Lote 1</th>
+                                <th>Lote 2</th>
+                                <th>Lote 3</th>
+                            </tr>
+                        </thead>
+                        <tbody id="${bodyId}">
+                            <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>4</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>5</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>6</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>7</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>8</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>9</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                            <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="controls">
+                        <button onclick="agregarFila(${numSecciones})">Agregar Muestra (${numSecciones})</button>
+                        <label><input type="checkbox" id="${mostrarLimitesId}" checked> Mostrar Límites de Control</label>
+                    </div>
+                </div>
+                <div class="section">
+                    <h2 id="${tituloGraficoId}">Gráfico ${numSecciones}</h2>
+                    <canvas id="${graficoId}" width="600" height="300"></canvas>
+                </div>
+            `;
+
+            document.getElementById('seccionesDatos').insertAdjacentHTML('beforeend', seccionHTML);
+
+            // Crear tabla de resultados
+            const tablaResultadosHTML = `
+                <h3 id="${tituloTablaId}">Resultados ${numSecciones}</h3>
+                <table id="tablaResultados${numSecciones}">
+                    <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
+                    <tr><td>Promedio</td><td id="avg${numSecciones}_1"></td><td id="avg${numSecciones}_2"></td><td id="avg${numSecciones}_3"></td></tr>
+                    <tr><td>Desv. Est.</td><td id="std${numSecciones}_1"></td><td id="std${numSecciones}_2"></td><td id="std${numSecciones}_3"></td></tr>
+                    <tr><td>Rango</td><td id="range${numSecciones}_1"></td><td id="range${numSecciones}_2"></td><td id="range${numSecciones}_3"></td></tr>
+                    <tr><td>Máximo</td><td id="max${numSecciones}_1"></td><td id="max${numSecciones}_2"></td><td id="max${numSecciones}_3"></td></tr>
+                    <tr><td>Mínimo</td><td id="min${numSecciones}_1"></td><td id="min${numSecciones}_2"></td><td id="min${numSecciones}_3"></td></tr>
+                    <tr><td>LCS</td><td id="lcs${numSecciones}_1"></td><td id="lcs${numSecciones}_2"></td><td id="lcs${numSecciones}_3"></td></tr>
+                    <tr><td>LCI</td><td id="lci${numSecciones}_1"></td><td id="lci${numSecciones}_2"></td><td id="lci${numSecciones}_3"></td></tr>
+                    <tr><td>Intervalo Confianza Sup.</td><td id="confSup${numSecciones}_1"></td><td id="confSup${numSecciones}_2"></td><td id="confSup${numSecciones}_3"></td></tr>
+                    <tr><td>Intervalo Confianza Inf.</td><td id="confInf${numSecciones}_1"></td><td id="confInf${numSecciones}_2"></td><td id="confInf${numSecciones}_3"></td></tr>
+                    <tr><td>Cp</td><td id="cp${numSecciones}_1"></td><td id="cp${numSecciones}_2"></td><td id="cp${numSecciones}_3"></td></tr>
+                    <tr><td>Cpk Sup</td><td id="cpkSup${numSecciones}_1"></td><td id="cpkSup${numSecciones}_2"></td><td id="cpkSup${numSecciones}_3"></td></tr>
+                    <tr><td>Cpk Inf</td><td id="cpkInf${numSecciones}_1"></td><td id="cpkInf${numSecciones}_2"></td><td id="cpkInf${numSecciones}_3"></td></tr>
+                </table>
+            `;
+            document.getElementById('tablasResultados').insertAdjacentHTML('beforeend', tablaResultadosHTML);
+
+            document.getElementById('seccionesGraficos').insertAdjacentHTML('beforeend', `
+                <div class="section">
+                    <h2 id="${tituloGraficoId}">Gráfico ${numSecciones}</h2>
+                    <canvas id="${graficoId}" width="600" height="300"></canvas>
+                </div>
+            `);
+        }
+
+        // Inicializar con las dos secciones existentes
+        document.addEventListener('DOMContentLoaded', () => {
+            agregarSeccion(); // Sección 1 (Peso)
+            agregarSeccion(); // Sección 2 (Uniformidad)
+        });
+
+        function agregarFila(seccion) {
+            const bodyId = `tablaBody${seccion}`;
+            const tbody = document.getElementById(bodyId);
+            const numMuestras = tbody.getElementsByTagName('tr').length + 1;
             const nuevaFila = document.createElement('tr');
             nuevaFila.innerHTML = `<td>${numMuestras}</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td>`;
             tbody.appendChild(nuevaFila);
         }
 
         function calcularEstadisticas() {
-            const tabla = document.getElementById('tablaPeso');
-            const filas = tabla.getElementsByTagName('tr');
-            let datos = [[], [], []]; // 3 lotes
+            const tituloDatos = document.getElementById('tituloDatos').value;
+            document.getElementById('tituloDatos1').textContent = tituloDatos;
+            document.getElementById('tituloDatos2').textContent = tituloDatos;
 
-            // Recolectar datos
-            for (let i = 1; i < filas.length; i++) {
-                const inputs = filas[i].getElementsByTagName('input');
-                for (let j = 0; j < 3; j++) {
-                    const valor = parseFloat(inputs[j].value) || 0;
-                    if (valor !== 0) datos[j].push(valor); // Solo incluir valores válidos
-                }
-            }
+            const analista = document.getElementById('analista').value || 'No especificado';
+            const lote = document.getElementById('lote').value || 'No especificado';
+            const horaInicio = document.getElementById('horaInicio').value || 'No especificado';
+            const horaFinal = document.getElementById('horaFinal').value || 'No especificado';
+            document.getElementById('analistaRes').textContent = analista;
+            document.getElementById('loteRes').textContent = lote;
+            document.getElementById('horaInicioRes').textContent = horaInicio;
+            document.getElementById('horaFinalRes').textContent = horaFinal;
 
-            // Obtener límites de especificación
             const les = parseFloat(document.getElementById('les').value);
             const lei = parseFloat(document.getElementById('lei').value);
-
-            // Obtener nivel de confianza
             const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value);
             const zScore = confidenceLevel === 90 ? 1.645 : confidenceLevel === 95 ? 1.96 : 2.576;
 
-            // Calcular estadísticas
-            const resultados = datos.map((lote, index) => {
-                if (lote.length === 0) return null; // Evitar cálculos con lotes vacíos
+            for (let i = 1; i <= numSecciones; i++) {
+                const inputTituloDatosId = `inputTituloDatos${i}`;
+                const inputTituloGraficoId = `inputTituloGrafico${i}`;
+                const inputTituloTablaId = `inputTituloTabla${i}`;
+                const tituloDatosId = `tituloDatos${i}`;
+                const tituloGraficoId = `tituloGrafico${i}H2`;
+                const tituloTablaId = `tituloTabla${i}H3`;
 
-                const avg = lote.reduce((a, b) => a + b, 0) / lote.length;
-                const max = Math.max(...lote);
-                const min = Math.min(...lote);
-                const range = max - min;
-                const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1));
+                const tituloDatosValor = document.getElementById(inputTituloDatosId).value || `Ingresar Datos ${i}`;
+                document.getElementById(tituloDatosId).textContent = tituloDatosValor;
 
-                // Límites de control (LCS y LCI)
-                const lcs = avg + 3 * std;
-                const lci = avg - 3 * std;
+                const tituloGraficoValor = document.getElementById(inputTituloGraficoId).value || `Gráfico ${i}`;
+                document.getElementById(tituloGraficoId).textContent = tituloGraficoValor;
 
-                // Intervalo de confianza
-                const errorStd = std / Math.sqrt(lote.length);
-                const confSup = avg + zScore * errorStd;
-                const confInf = avg - zScore * errorStd;
+                const tituloTablaValor = document.getElementById(inputTituloTablaId).value || `Resultados ${i}`;
+                document.getElementById(tituloTablaId).textContent = tituloTablaValor;
 
-                // Cp y Cpk
-                const cp = (les - lei) / (6 * std);
-                const cpkSup = (les - avg) / (3 * std);
-                const cpkInf = (avg - lei) / (3 * std);
+                const tablaId = `tablaPeso${i}`;
+                const bodyId = `tablaBody${i}`;
+                const mostrarLimitesId = `mostrarLimites${i}`;
+                const graficoId = `graficoPeso${i}`;
+                const filas = document.getElementById(tablaId).getElementsByTagName('tr');
+                let datos = [[], [], []];
 
-                return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
-            });
-
-            // Mostrar resultados
-            for (let i = 0; i < 3; i++) {
-                const res = resultados[i];
-                if (!res) {
-                    document.getElementById(`avg${i+1}`).textContent = 'N/A';
-                    document.getElementById(`std${i+1}`).textContent = 'N/A';
-                    document.getElementById(`range${i+1}`).textContent = 'N/A';
-                    document.getElementById(`max${i+1}`).textContent = 'N/A';
-                    document.getElementById(`min${i+1}`).textContent = 'N/A';
-                    document.getElementById(`lcs${i+1}`).textContent = 'N/A';
-                    document.getElementById(`lci${i+1}`).textContent = 'N/A';
-                    document.getElementById(`confSup${i+1}`).textContent = 'N/A';
-                    document.getElementById(`confInf${i+1}`).textContent = 'N/A';
-                    document.getElementById(`cp${i+1}`).textContent = 'N/A';
-                    document.getElementById(`cpkSup${i+1}`).textContent = 'N/A';
-                    document.getElementById(`cpkInf${i+1}`).textContent = 'N/A';
-                    continue;
+                for (let j = 1; j < filas.length; j++) {
+                    const inputs = filas[j].getElementsByTagName('input');
+                    for (let k = 0; k < 3; k++) {
+                        const valor = parseFloat(inputs[k].value) || 0;
+                        if (valor !== 0) datos[k].push(valor);
+                    }
                 }
-                document.getElementById(`avg${i+1}`).textContent = res.avg.toFixed(2);
-                document.getElementById(`std${i+1}`).textContent = res.std.toFixed(2);
-                document.getElementById(`range${i+1}`).textContent = res.range.toFixed(2);
-                document.getElementById(`max${i+1}`).textContent = res.max.toFixed(2);
-                document.getElementById(`min${i+1}`).textContent = res.min.toFixed(2);
-                document.getElementById(`lcs${i+1}`).textContent = res.lcs.toFixed(2);
-                document.getElementById(`lci${i+1}`).textContent = res.lci.toFixed(2);
-                document.getElementById(`confSup${i+1}`).textContent = res.confSup.toFixed(2);
-                document.getElementById(`confInf${i+1}`).textContent = res.confInf.toFixed(2);
-                document.getElementById(`cp${i+1}`).textContent = res.cp.toFixed(2);
-                document.getElementById(`cpkSup${i+1}`).textContent = res.cpkSup.toFixed(2);
-                document.getElementById(`cpkInf${i+1}`).textContent = res.cpkInf.toFixed(2);
-            }
 
-            // Generar gráfico
-            if (chart) chart.destroy();
-            const ctx = document.getElementById('graficoPeso').getContext('2d');
-            const mostrarLimites = document.getElementById('mostrarLimites').checked;
+                const resultados = datos.map((lote, k) => {
+                    if (lote.length === 0) return null;
 
-            const datasets = [
-                { label: 'Lote 1', data: datos[0], borderColor: 'red', fill: false },
-                { label: 'Lote 2', data: datos[1], borderColor: 'blue', fill: false },
-                { label: 'Lote 3', data: datos[2], borderColor: 'green', fill: false }
-            ];
+                    const avg = lote.reduce((a, b) => a + b, 0) / lote.length;
+                    const max = Math.max(...lote);
+                    const min = Math.min(...lote);
+                    const range = max - min;
+                    const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1));
+                    const lcs = avg + 3 * std;
+                    const lci = avg - 3 * std;
+                    const errorStd = std / Math.sqrt(lote.length);
+                    const confSup = avg + zScore * errorStd;
+                    const confInf = avg - zScore * errorStd;
+                    const cp = (les - lei) / (6 * std);
+                    const cpkSup = (les - avg) / (3 * std);
+                    const cpkInf = (avg - lei) / (3 * std);
 
-            // Agregar límites de control si están habilitados
-            if (mostrarLimites) {
-                resultados.forEach((res, i) => {
-                    if (res) {
-                        datasets.push({
-                            label: `LCS Lote ${i+1}`,
-                            data: Array(datos[i].length).fill(res.lcs),
-                            borderColor: datasets[i].borderColor,
-                            borderDash: [5, 5],
-                            fill: false,
-                            pointRadius: 0
-                        });
-                        datasets.push({
-                            label: `LCI Lote ${i+1}`,
-                            data: Array(datos[i].length).fill(res.lci),
-                            borderColor: datasets[i].borderColor,
-                            borderDash: [5, 5],
-                            fill: false,
-                            pointRadius: 0
-                        });
+                    return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
+                });
+
+                for (let k = 0; k < 3; k++) {
+                    const res = resultados[k];
+                    if (!res) {
+                        document.getElementById(`avg${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`std${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`range${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`max${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`min${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`lcs${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`lci${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`confSup${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`confInf${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`cp${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`cpkSup${i}_${k+1}`).textContent = 'N/A';
+                        document.getElementById(`cpkInf${i}_${k+1}`).textContent = 'N/A';
+                        continue;
+                    }
+                    document.getElementById(`avg${i}_${k+1}`).textContent = res.avg.toFixed(2);
+                    document.getElementById(`std${i}_${k+1}`).textContent = res.std.toFixed(2);
+                    document.getElementById(`range${i}_${k+1}`).textContent = res.range.toFixed(2);
+                    document.getElementById(`max${i}_${k+1}`).textContent = res.max.toFixed(2);
+                    document.getElementById(`min${i}_${k+1}`).textContent = res.min.toFixed(2);
+                    document.getElementById(`lcs${i}_${k+1}`).textContent = res.lcs.toFixed(2);
+                    document.getElementById(`lci${i}_${k+1}`).textContent = res.lci.toFixed(2);
+                    document.getElementById(`confSup${i}_${k+1}`).textContent = res.confSup.toFixed(2);
+                    document.getElementById(`confInf${i}_${k+1}`).textContent = res.confInf.toFixed(2);
+                    document.getElementById(`cp${i}_${k+1}`).textContent = res.cp.toFixed(2);
+                    document.getElementById(`cpkSup${i}_${k+1}`).textContent = res.cpkSup.toFixed(2);
+                    document.getElementById(`cpkInf${i}_${k+1}`).textContent = res.cpkInf.toFixed(2);
+                }
+
+                if (chartInstances[graficoId]) chartInstances[graficoId].destroy();
+                const ctx = document.getElementById(graficoId).getContext('2d');
+                const mostrarLimites = document.getElementById(mostrarLimitesId).checked;
+
+                const datasets = [
+                    { label: `Lote 1 (${i})`, data: datos[0], borderColor: 'red', fill: false },
+                    { label: `Lote 2 (${i})`, data: datos[1], borderColor: 'blue', fill: false },
+                    { label: `Lote 3 (${i})`, data: datos[2], borderColor: 'green', fill: false }
+                ];
+
+                if (mostrarLimites) {
+                    resultados.forEach((res, k) => {
+                        if (res) {
+                            datasets.push({
+                                label: `LCS Lote ${k+1} (${i})`,
+                                data: Array(datos[k].length).fill(res.lcs),
+                                borderColor: datasets[k].borderColor,
+                                borderDash: [5, 5],
+                                fill: false,
+                                pointRadius: 0
+                            });
+                            datasets.push({
+                                label: `LCI Lote ${k+1} (${i})`,
+                                data: Array(datos[k].length).fill(res.lci),
+                                borderColor: datasets[k].borderColor,
+                                borderDash: [5, 5],
+                                fill: false,
+                                pointRadius: 0
+                            });
+                        }
+                    });
+                }
+
+                chartInstances[graficoId] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({ length: Math.max(...datos.map(d => d.length)) }, (_, j) => `Muestra ${j+1}`),
+                        datasets: datasets
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: false }
+                        }
                     }
                 });
             }
 
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({ length: Math.max(...datos.map(d => d.length)) }, (_, i) => `Muestra ${i+1}`),
-                    datasets: datasets
-                },
-                options: {
-                    scales: {
-                        y: { beginAtZero: false }
-                    }
-                }
-            });
+            const analisis = document.getElementById('analisis').value || 'Sin análisis';
+            document.getElementById('analisis').value = analisis;
         }
     </script>
 </body>
