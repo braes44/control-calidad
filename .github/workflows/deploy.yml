@@ -12,13 +12,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Preparar archivos
+      - name: Verificar archivos
         run: |
-          mkdir -p docs
-          cp index.html docs/
+          ls -la
+          if [ ! -f index.html ]; then
+            echo "Error: index.html no encontrado en la raíz"
+            exit 1
+          fi
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+      # No necesitamos copiar a /docs ni usar gh-pages, porque ya está configurado para main y /root
+      - name: Confirmar publicación
+        run: |
+          echo "Archivos listos para publicación en GitHub Pages desde main y /root"
