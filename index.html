@@ -279,6 +279,10 @@
         function agregarFila(seccion) {
             const bodyId = `tablaBody${seccion}`;
             const tbody = document.getElementById(bodyId);
+            if (!tbody) {
+                console.error(`No se encontró el tbody con ID ${bodyId}`);
+                return;
+            }
             const numMuestras = tbody.getElementsByTagName('tr').length + 1;
             const nuevaFila = document.createElement('tr');
             nuevaFila.innerHTML = `<td>${numMuestras}</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td>`;
@@ -286,10 +290,6 @@
         }
 
         function calcularEstadisticas() {
-            const tituloDatos = document.getElementById('tituloDatos').value;
-            document.getElementById('tituloDatos1').textContent = tituloDatos;
-            document.getElementById('tituloDatos2').textContent = tituloDatos;
-
             const analista = document.getElementById('analista').value || 'No especificado';
             const lote = document.getElementById('lote').value || 'No especificado';
             const horaInicio = document.getElementById('horaInicio').value || 'No especificado';
@@ -299,156 +299,197 @@
             document.getElementById('horaInicioRes').textContent = horaInicio;
             document.getElementById('horaFinalRes').textContent = horaFinal;
 
-            const les = parseFloat(document.getElementById('les').value);
-            const lei = parseFloat(document.getElementById('lei').value);
-            const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value);
+            const les = parseFloat(document.getElementById('les').value) || 0;
+            const lei = parseFloat(document.getElementById('lei').value) || 0;
+            const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value) || 95;
             const zScore = confidenceLevel === 90 ? 1.645 : confidenceLevel === 95 ? 1.96 : 2.576;
 
             for (let i = 1; i <= numSecciones; i++) {
-                const inputTituloDatosId = `inputTituloDatos${i}`;
-                const inputTituloGraficoId = `inputTituloGrafico${i}`;
-                const inputTituloTablaId = `inputTituloTabla${i}`;
-                const tituloDatosId = `tituloDatos${i}`;
-                const tituloGraficoId = `tituloGrafico${i}H2`;
-                const tituloTablaId = `tituloTabla${i}H3`;
+                try {
+                    const inputTituloDatosId = `inputTituloDatos${i}`;
+                    const inputTituloGraficoId = `inputTituloGrafico${i}`;
+                    const inputTituloTablaId = `inputTituloTabla${i}`;
+                    const tituloDatosId = `tituloDatos${i}`;
+                    const tituloGraficoId = `tituloGrafico${i}H2`;
+                    const tituloTablaId = `tituloTabla${i}H3`;
 
-                const tituloDatosValor = document.getElementById(inputTituloDatosId).value || `Ingresar Datos ${i}`;
-                document.getElementById(tituloDatosId).textContent = tituloDatosValor;
+                    const tituloDatosElement = document.getElementById(inputTituloDatosId);
+                    const tituloGraficoElement = document.getElementById(inputTituloGraficoId);
+                    const tituloTablaElement = document.getElementById(inputTituloTablaId);
 
-                const tituloGraficoValor = document.getElementById(inputTituloGraficoId).value || `Gráfico ${i}`;
-                document.getElementById(tituloGraficoId).textContent = tituloGraficoValor;
-
-                const tituloTablaValor = document.getElementById(inputTituloTablaId).value || `Resultados ${i}`;
-                document.getElementById(tituloTablaId).textContent = tituloTablaValor;
-
-                const tablaId = `tablaPeso${i}`;
-                const bodyId = `tablaBody${i}`;
-                const mostrarLimitesId = `mostrarLimites${i}`;
-                const graficoId = `graficoPeso${i}`;
-                const filas = document.getElementById(tablaId).getElementsByTagName('tr');
-                let datos = [[], [], []];
-
-                // Extraer datos de forma segura
-                for (let j = 1; j < filas.length; j++) {
-                    const inputs = filas[j].getElementsByTagName('input');
-                    for (let k = 0; k < 3; k++) {
-                        const valor = parseFloat(inputs[k].value);
-                        if (!isNaN(valor)) datos[k].push(valor); // Solo agregar valores válidos
-                    }
-                }
-
-                const resultados = datos.map((lote, k) => {
-                    if (lote.length === 0) return null;
-
-                    const avg = lote.reduce((a, b) => a + b, 0) / lote.length;
-                    const max = Math.max(...lote);
-                    const min = Math.min(...lote);
-                    const range = max - min;
-                    const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1)) || 0;
-                    const lcs = avg + 3 * std;
-                    const lci = avg - 3 * std;
-                    const errorStd = std / Math.sqrt(lote.length) || 0;
-                    const confSup = avg + zScore * errorStd;
-                    const confInf = avg - zScore * errorStd;
-                    const cp = (les - lei) / (6 * std) || 0;
-                    const cpkSup = (les - avg) / (3 * std) || 0;
-                    const cpkInf = (avg - lei) / (3 * std) || 0;
-
-                    return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
-                });
-
-                for (let k = 0; k < 3; k++) {
-                    const res = resultados[k];
-                    if (!res) {
-                        document.getElementById(`avg${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`std${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`range${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`max${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`min${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`lcs${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`lci${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`confSup${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`confInf${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`cp${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`cpkSup${i}_${k+1}`).textContent = 'N/A';
-                        document.getElementById(`cpkInf${i}_${k+1}`).textContent = 'N/A';
+                    if (!tituloDatosElement || !tituloGraficoElement || !tituloTablaElement) {
+                        console.error(`No se encontraron los elementos de título para la sección ${i}`);
                         continue;
                     }
-                    document.getElementById(`avg${i}_${k+1}`).textContent = res.avg.toFixed(2);
-                    document.getElementById(`std${i}_${k+1}`).textContent = res.std.toFixed(2);
-                    document.getElementById(`range${i}_${k+1}`).textContent = res.range.toFixed(2);
-                    document.getElementById(`max${i}_${k+1}`).textContent = res.max.toFixed(2);
-                    document.getElementById(`min${i}_${k+1}`).textContent = res.min.toFixed(2);
-                    document.getElementById(`lcs${i}_${k+1}`).textContent = res.lcs.toFixed(2);
-                    document.getElementById(`lci${i}_${k+1}`).textContent = res.lci.toFixed(2);
-                    document.getElementById(`confSup${i}_${k+1}`).textContent = res.confSup.toFixed(2);
-                    document.getElementById(`confInf${i}_${k+1}`).textContent = res.confInf.toFixed(2);
-                    document.getElementById(`cp${i}_${k+1}`).textContent = res.cp.toFixed(2);
-                    document.getElementById(`cpkSup${i}_${k+1}`).textContent = res.cpkSup.toFixed(2);
-                    document.getElementById(`cpkInf${i}_${k+1}`).textContent = res.cpkInf.toFixed(2);
-                }
 
-                // Destruir gráfico anterior si existe
-                if (chartInstances[graficoId]) {
-                    chartInstances[graficoId].destroy();
-                }
+                    const tituloDatosValor = tituloDatosElement.value || `Ingresar Datos ${i}`;
+                    const tituloGraficoValor = tituloGraficoElement.value || `Gráfico ${i}`;
+                    const tituloTablaValor = tituloTablaElement.value || `Resultados ${i}`;
 
-                // Verificar si el canvas existe
-                const canvas = document.getElementById(graficoId);
-                if (!canvas) {
-                    console.error(`Canvas con ID ${graficoId} no encontrado`);
-                    continue;
-                }
+                    document.getElementById(tituloDatosId).textContent = tituloDatosValor;
+                    document.getElementById(tituloGraficoId).textContent = tituloGraficoValor;
+                    document.getElementById(tituloTablaId).textContent = tituloTablaValor;
 
-                const ctx = canvas.getContext('2d');
-                const mostrarLimites = document.getElementById(mostrarLimitesId).checked;
+                    const tablaId = `tablaPeso${i}`;
+                    const bodyId = `tablaBody${i}`;
+                    const mostrarLimitesId = `mostrarLimites${i}`;
+                    const graficoId = `graficoPeso${i}`;
 
-                const maxLength = Math.max(...datos.map(d => d.length));
-                const labels = Array.from({ length: maxLength }, (_, j) => `Muestra ${j+1}`);
+                    const tabla = document.getElementById(tablaId);
+                    if (!tabla) {
+                        console.error(`No se encontró la tabla con ID ${tablaId}`);
+                        continue;
+                    }
 
-                const datasets = [
-                    { label: `Lote 1 (${i})`, data: datos[0], borderColor: 'red', fill: false },
-                    { label: `Lote 2 (${i})`, data: datos[1], borderColor: 'blue', fill: false },
-                    { label: `Lote 3 (${i})`, data: datos[2], borderColor: 'green', fill: false }
-                ];
+                    const filas = tabla.getElementsByTagName('tr');
+                    let datos = [[], [], []];
 
-                if (mostrarLimites) {
-                    resultados.forEach((res, k) => {
-                        if (res) {
-                            datasets.push({
-                                label: `LCS Lote ${k+1} (${i})`,
-                                data: Array(maxLength).fill(res.lcs),
-                                borderColor: datasets[k].borderColor,
-                                borderDash: [5, 5],
-                                fill: false,
-                                pointRadius: 0
-                            });
-                            datasets.push({
-                                label: `LCI Lote ${k+1} (${i})`,
-                                data: Array(maxLength).fill(res.lci),
-                                borderColor: datasets[k].borderColor,
-                                borderDash: [5, 5],
-                                fill: false,
-                                pointRadius: 0
-                            });
+                    // Extraer datos de forma segura
+                    for (let j = 1; j < filas.length; j++) {
+                        const inputs = filas[j].getElementsByTagName('input');
+                        for (let k = 0; k < 3; k++) {
+                            const valor = parseFloat(inputs[k].value);
+                            if (!isNaN(valor) && valor !== 0) datos[k].push(valor); // Solo agregar valores válidos y no cero
+                        }
+                    }
+
+                    const resultados = datos.map((lote, k) => {
+                        if (lote.length === 0) return null;
+
+                        const avg = lote.reduce((a, b) => a + b, 0) / lote.length;
+                        const max = Math.max(...lote);
+                        const min = Math.min(...lote);
+                        const range = max - min;
+                        const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1)) || 0;
+                        const lcs = avg + 3 * std;
+                        const lci = avg - 3 * std;
+                        const errorStd = std / Math.sqrt(lote.length) || 0;
+                        const confSup = avg + zScore * errorStd;
+                        const confInf = avg - zScore * errorStd;
+                        const cp = (les - lei) / (6 * std) || 0;
+                        const cpkSup = (les - avg) / (3 * std) || 0;
+                        const cpkInf = (avg - lei) / (3 * std) || 0;
+
+                        return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
+                    });
+
+                    for (let k = 0; k < 3; k++) {
+                        const res = resultados[k];
+                        const avgElement = document.getElementById(`avg${i}_${k+1}`);
+                        if (!avgElement) {
+                            console.error(`No se encontró el elemento avg${i}_${k+1}`);
+                            continue;
+                        }
+
+                        if (!res) {
+                            avgElement.textContent = 'N/A';
+                            document.getElementById(`std${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`range${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`max${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`min${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`lcs${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`lci${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`confSup${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`confInf${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`cp${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`cpkSup${i}_${k+1}`).textContent = 'N/A';
+                            document.getElementById(`cpkInf${i}_${k+1}`).textContent = 'N/A';
+                            continue;
+                        }
+                        avgElement.textContent = res.avg.toFixed(2);
+                        document.getElementById(`std${i}_${k+1}`).textContent = res.std.toFixed(2);
+                        document.getElementById(`range${i}_${k+1}`).textContent = res.range.toFixed(2);
+                        document.getElementById(`max${i}_${k+1}`).textContent = res.max.toFixed(2);
+                        document.getElementById(`min${i}_${k+1}`).textContent = res.min.toFixed(2);
+                        document.getElementById(`lcs${i}_${k+1}`).textContent = res.lcs.toFixed(2);
+                        document.getElementById(`lci${i}_${k+1}`).textContent = res.lci.toFixed(2);
+                        document.getElementById(`confSup${i}_${k+1}`).textContent = res.confSup.toFixed(2);
+                        document.getElementById(`confInf${i}_${k+1}`).textContent = res.confInf.toFixed(2);
+                        document.getElementById(`cp${i}_${k+1}`).textContent = res.cp.toFixed(2);
+                        document.getElementById(`cpkSup${i}_${k+1}`).textContent = res.cpkSup.toFixed(2);
+                        document.getElementById(`cpkInf${i}_${k+1}`).textContent = res.cpkInf.toFixed(2);
+                    }
+
+                    // Destruir gráfico anterior si existe
+                    if (chartInstances[graficoId]) {
+                        chartInstances[graficoId].destroy();
+                        chartInstances[graficoId] = null;
+                    }
+
+                    // Verificar si el canvas existe
+                    const canvas = document.getElementById(graficoId);
+                    if (!canvas) {
+                        console.error(`Canvas con ID ${graficoId} no encontrado`);
+                        continue;
+                    }
+
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        console.error(`No se pudo obtener el contexto 2D para el canvas ${graficoId}`);
+                        continue;
+                    }
+
+                    const mostrarLimitesElement = document.getElementById(mostrarLimitesId);
+                    if (!mostrarLimitesElement) {
+                        console.error(`No se encontró el elemento mostrarLimites con ID ${mostrarLimitesId}`);
+                        continue;
+                    }
+                    const mostrarLimites = mostrarLimitesElement.checked;
+
+                    const maxLength = Math.max(...datos.map(d => d.length), 1); // Asegurar que maxLength sea al menos 1
+                    const labels = Array.from({ length: maxLength }, (_, j) => `Muestra ${j+1}`);
+
+                    const datasets = [];
+                    if (datos[0].length > 0) datasets.push({ label: `Lote 1 (${i})`, data: datos[0], borderColor: 'red', fill: false });
+                    if (datos[1].length > 0) datasets.push({ label: `Lote 2 (${i})`, data: datos[1], borderColor: 'blue', fill: false });
+                    if (datos[2].length > 0) datasets.push({ label: `Lote 3 (${i})`, data: datos[2], borderColor: 'green', fill: false });
+
+                    if (mostrarLimites) {
+                        resultados.forEach((res, k) => {
+                            if (res && datos[k].length > 0) {
+                                datasets.push({
+                                    label: `LCS Lote ${k+1} (${i})`,
+                                    data: Array(maxLength).fill(res.lcs),
+                                    borderColor: datasets[k].borderColor,
+                                    borderDash: [5, 5],
+                                    fill: false,
+                                    pointRadius: 0
+                                });
+                                datasets.push({
+                                    label: `LCI Lote ${k+1} (${i})`,
+                                    data: Array(maxLength).fill(res.lci),
+                                    borderColor: datasets[k].borderColor,
+                                    borderDash: [5, 5],
+                                    fill: false,
+                                    pointRadius: 0
+                                });
+                            }
+                        });
+                    }
+
+                    if (datasets.length === 0) {
+                        console.warn(`No hay datos válidos para graficar en la sección ${i}`);
+                        continue;
+                    }
+
+                    chartInstances[graficoId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            scales: {
+                                y: { beginAtZero: false }
+                            },
+                            responsive: true,
+                            maintainAspectRatio: false
                         }
                     });
+                } catch (error) {
+                    console.error(`Error al procesar la sección ${i}:`, error);
+                    continue;
                 }
-
-                chartInstances[graficoId] = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: datasets
-                    },
-                    options: {
-                        scales: {
-                            y: { beginAtZero: false }
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
             }
 
             const analisis = document.getElementById('analisis').value || 'Sin análisis';
