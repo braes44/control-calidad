@@ -128,11 +128,11 @@
             display: block;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Control de Calidad</h1>
+        <h1>Control de Calidad - Tabletas Recubiertas</h1>
 
         <!-- Configuración General -->
         <div class="section">
@@ -162,7 +162,7 @@
             </div>
         </div>
 
-        <!-- Secciones Dinámicas de Ingreso de Datos -->
+        <!-- Secciones Dinámicas de Ingreso de Datos y Gráficos -->
         <div id="seccionesDatos"></div>
         <div class="section" style="text-align: center;">
             <button onclick="agregarSeccion()">Agregar Nueva Sección de Datos</button>
@@ -186,9 +186,6 @@
             <h3>Análisis de las Gráficas</h3>
             <textarea id="analisis" placeholder="Escribe tu análisis de las gráficas aquí..."></textarea>
         </div>
-
-        <!-- Gráficas -->
-        <div id="seccionesGraficos"></div>
     </div>
 
     <script>
@@ -209,7 +206,7 @@
             const inputTituloGraficoId = `inputTituloGrafico${numSecciones}`;
             const inputTituloTablaId = `inputTituloTabla${numSecciones}`;
 
-            // Crear sección de ingreso de datos
+            // Crear sección de ingreso de datos y gráfico
             const seccionHTML = `
                 <div class="section" id="${seccionId}">
                     <div class="form-group">
@@ -244,8 +241,6 @@
                         <button onclick="agregarFila(${numSecciones})">Agregar Muestra (${numSecciones})</button>
                         <label><input type="checkbox" id="${mostrarLimitesId}" checked> Mostrar Límites de Control</label>
                     </div>
-                </div>
-                <div class="section">
                     <h2 id="${tituloGraficoId}">Gráfico ${numSecciones}</h2>
                     <canvas id="${graficoId}" width="600" height="300"></canvas>
                 </div>
@@ -273,13 +268,6 @@
                 </table>
             `;
             document.getElementById('tablasResultados').insertAdjacentHTML('beforeend', tablaResultadosHTML);
-
-            document.getElementById('seccionesGraficos').insertAdjacentHTML('beforeend', `
-                <div class="section">
-                    <h2 id="${tituloGraficoId}">Gráfico ${numSecciones}</h2>
-                    <canvas id="${graficoId}" width="600" height="300"></canvas>
-                </div>
-            `);
         }
 
         // Inicializar con las dos secciones existentes
@@ -340,11 +328,12 @@
                 const filas = document.getElementById(tablaId).getElementsByTagName('tr');
                 let datos = [[], [], []];
 
+                // Extraer datos de forma segura
                 for (let j = 1; j < filas.length; j++) {
                     const inputs = filas[j].getElementsByTagName('input');
                     for (let k = 0; k < 3; k++) {
-                        const valor = parseFloat(inputs[k].value) || 0;
-                        if (valor !== 0) datos[k].push(valor);
+                        const valor = parseFloat(inputs[k].value);
+                        if (!isNaN(valor)) datos[k].push(valor); // Solo agregar valores válidos
                     }
                 }
 
@@ -355,15 +344,15 @@
                     const max = Math.max(...lote);
                     const min = Math.min(...lote);
                     const range = max - min;
-                    const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1));
+                    const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1)) || 0;
                     const lcs = avg + 3 * std;
                     const lci = avg - 3 * std;
-                    const errorStd = std / Math.sqrt(lote.length);
+                    const errorStd = std / Math.sqrt(lote.length) || 0;
                     const confSup = avg + zScore * errorStd;
                     const confInf = avg - zScore * errorStd;
-                    const cp = (les - lei) / (6 * std);
-                    const cpkSup = (les - avg) / (3 * std);
-                    const cpkInf = (avg - lei) / (3 * std);
+                    const cp = (les - lei) / (6 * std) || 0;
+                    const cpkSup = (les - avg) / (3 * std) || 0;
+                    const cpkInf = (avg - lei) / (3 * std) || 0;
 
                     return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
                 });
@@ -399,9 +388,23 @@
                     document.getElementById(`cpkInf${i}_${k+1}`).textContent = res.cpkInf.toFixed(2);
                 }
 
-                if (chartInstances[graficoId]) chartInstances[graficoId].destroy();
-                const ctx = document.getElementById(graficoId).getContext('2d');
+                // Destruir gráfico anterior si existe
+                if (chartInstances[graficoId]) {
+                    chartInstances[graficoId].destroy();
+                }
+
+                // Verificar si el canvas existe
+                const canvas = document.getElementById(graficoId);
+                if (!canvas) {
+                    console.error(`Canvas con ID ${graficoId} no encontrado`);
+                    continue;
+                }
+
+                const ctx = canvas.getContext('2d');
                 const mostrarLimites = document.getElementById(mostrarLimitesId).checked;
+
+                const maxLength = Math.max(...datos.map(d => d.length));
+                const labels = Array.from({ length: maxLength }, (_, j) => `Muestra ${j+1}`);
 
                 const datasets = [
                     { label: `Lote 1 (${i})`, data: datos[0], borderColor: 'red', fill: false },
@@ -414,7 +417,7 @@
                         if (res) {
                             datasets.push({
                                 label: `LCS Lote ${k+1} (${i})`,
-                                data: Array(datos[k].length).fill(res.lcs),
+                                data: Array(maxLength).fill(res.lcs),
                                 borderColor: datasets[k].borderColor,
                                 borderDash: [5, 5],
                                 fill: false,
@@ -422,7 +425,7 @@
                             });
                             datasets.push({
                                 label: `LCI Lote ${k+1} (${i})`,
-                                data: Array(datos[k].length).fill(res.lci),
+                                data: Array(maxLength).fill(res.lci),
                                 borderColor: datasets[k].borderColor,
                                 borderDash: [5, 5],
                                 fill: false,
@@ -435,13 +438,15 @@
                 chartInstances[graficoId] = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: Array.from({ length: Math.max(...datos.map(d => d.length)) }, (_, j) => `Muestra ${j+1}`),
+                        labels: labels,
                         datasets: datasets
                     },
                     options: {
                         scales: {
                             y: { beginAtZero: false }
-                        }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
                     }
                 });
             }
