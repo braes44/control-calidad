@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Control de Calidad - Tabletas Recubiertas</h1>
+    <h1>Control de Calidad o control de procesos</h1>
 
     <!-- Configuración General -->
     <h2>Configuración General</h2>
@@ -67,12 +67,12 @@
             <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
         </tbody>
     </table>
-    <button onclick="agregarFila(1)">Agregar Muestra (Peso)</button>
+    <button onclick="agregarFila(1)">Agregar Muestra (Datos_1)</button>
     <label><input type="checkbox" id="mostrarLimites1" checked> Mostrar Límites de Control en el Gráfico</label>
 
     <!-- Segunda Sección de Ingreso de Datos -->
-    <h2>Ingresar Datos de Uniformidad (mg)</h2>
-    <table id="tablaPeso2">
+    <h2>Ingresar Datos 2 (mg)</h2>
+    <table id="tabla2">
         <thead>
             <tr>
                 <th>Muestra</th>
@@ -94,7 +94,7 @@
             <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
         </tbody>
     </table>
-    <button onclick="agregarFila(2)">Agregar Muestra (Uniformidad)</button>
+    <button onclick="agregarFila(2)">Agregar Muestra Datos_2</button>
     <label><input type="checkbox" id="mostrarLimites2" checked> Mostrar Límites de Control en el Gráfico</label>
 
     <br>
@@ -109,38 +109,38 @@
         <p>Hora Final: <span id="horaFinalRes"></span></p>
         <table id="tablaResultados">
             <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
-            <tr><td>Promedio (Peso)</td><td id="avg1_1"></td><td id="avg1_2"></td><td id="avg1_3"></td></tr>
-            <tr><td>Desv. Est. (Peso)</td><td id="std1_1"></td><td id="std1_2"></td><td id="std1_3"></td></tr>
-            <tr><td>Rango (Peso)</td><td id="range1_1"></td><td id="range1_2"></td><td id="range1_3"></td></tr>
-            <tr><td>Máximo (Peso)</td><td id="max1_1"></td><td id="max1_2"></td><td id="max1_3"></td></tr>
-            <tr><td>Mínimo (Peso)</td><td id="min1_1"></td><td id="min1_2"></td><td id="min1_3"></td></tr>
-            <tr><td>LCS (Peso)</td><td id="lcs1_1"></td><td id="lcs1_2"></td><td id="lcs1_3"></td></tr>
-            <tr><td>LCI (Peso)</td><td id="lci1_1"></td><td id="lci1_2"></td><td id="lci1_3"></td></tr>
-            <tr><td>Intervalo Confianza Sup. (Peso)</td><td id="confSup1_1"></td><td id="confSup1_2"></td><td id="confSup1_3"></td></tr>
-            <tr><td>Intervalo Confianza Inf. (Peso)</td><td id="confInf1_1"></td><td id="confInf1_2"></td><td id="confInf1_3"></td></tr>
-            <tr><td>Cp (Peso)</td><td id="cp1_1"></td><td id="cp1_2"></td><td id="cp1_3"></td></tr>
-            <tr><td>Cpk Sup (Peso)</td><td id="cpkSup1_1"></td><td id="cpkSup1_2"></td><td id="cpkSup1_3"></td></tr>
-            <tr><td>Cpk Inf (Peso)</td><td id="cpkInf1_1"></td><td id="cpkInf1_2"></td><td id="cpkInf1_3"></td></tr>
-            <tr><td>Promedio (Uniformidad)</td><td id="avg2_1"></td><td id="avg2_2"></td><td id="avg2_3"></td></tr>
-            <tr><td>Desv. Est. (Uniformidad)</td><td id="std2_1"></td><td id="std2_2"></td><td id="std2_3"></td></tr>
-            <tr><td>Rango (Uniformidad)</td><td id="range2_1"></td><td id="range2_2"></td><td id="range2_3"></td></tr>
-            <tr><td>Máximo (Uniformidad)</td><td id="max2_1"></td><td id="max2_2"></td><td id="max2_3"></td></tr>
-            <tr><td>Mínimo (Uniformidad)</td><td id="min2_1"></td><td id="min2_2"></td><td id="min2_3"></td></tr>
-            <tr><td>LCS (Uniformidad)</td><td id="lcs2_1"></td><td id="lcs2_2"></td><td id="lcs2_3"></td></tr>
-            <tr><td>LCI (Uniformidad)</td><td id="lci2_1"></td><td id="lci2_2"></td><td id="lci2_3"></td></tr>
-            <tr><td>Intervalo Confianza Sup. (Uniformidad)</td><td id="confSup2_1"></td><td id="confSup2_2"></td><td id="confSup2_3"></td></tr>
-            <tr><td>Intervalo Confianza Inf. (Uniformidad)</td><td id="confInf2_1"></td><td id="confInf2_2"></td><td id="confInf2_3"></td></tr>
-            <tr><td>Cp (Uniformidad)</td><td id="cp2_1"></td><td id="cp2_2"></td><td id="cp2_3"></td></tr>
-            <tr><td>Cpk Sup (Uniformidad)</td><td id="cpkSup2_1"></td><td id="cpkSup2_2"></td><td id="cpkSup2_3"></td></tr>
-            <tr><td>Cpk Inf (Uniformidad)</td><td id="cpkInf2_1"></td><td id="cpkInf2_2"></td><td id="cpkInf2_3"></td></tr>
+            <tr><td>Promedio Datos_1</td><td id="avg1_1"></td><td id="avg1_2"></td><td id="avg1_3"></td></tr>
+            <tr><td>Desv. Est. Datos_1</td><td id="std1_1"></td><td id="std1_2"></td><td id="std1_3"></td></tr>
+            <tr><td>Rango Datos_1</td><td id="range1_1"></td><td id="range1_2"></td><td id="range1_3"></td></tr>
+            <tr><td>Máximo Datos_1</td><td id="max1_1"></td><td id="max1_2"></td><td id="max1_3"></td></tr>
+            <tr><td>Mínimo Datos_1</td><td id="min1_1"></td><td id="min1_2"></td><td id="min1_3"></td></tr>
+            <tr><td>LCS Datos_1</td><td id="lcs1_1"></td><td id="lcs1_2"></td><td id="lcs1_3"></td></tr>
+            <tr><td>LCI Datos_1</td><td id="lci1_1"></td><td id="lci1_2"></td><td id="lci1_3"></td></tr>
+            <tr><td>Intervalo Confianza Sup. Datos_1</td><td id="confSup1_1"></td><td id="confSup1_2"></td><td id="confSup1_3"></td></tr>
+            <tr><td>Intervalo Confianza Inf. Datos_1</td><td id="confInf1_1"></td><td id="confInf1_2"></td><td id="confInf1_3"></td></tr>
+            <tr><td>Cp Datos_1</td><td id="cp1_1"></td><td id="cp1_2"></td><td id="cp1_3"></td></tr>
+            <tr><td>Cpk Sup Datos_1</td><td id="cpkSup1_1"></td><td id="cpkSup1_2"></td><td id="cpkSup1_3"></td></tr>
+            <tr><td>Cpk Inf Datos_1</td><td id="cpkInf1_1"></td><td id="cpkInf1_2"></td><td id="cpkInf1_3"></td></tr>
+            <tr><td>Promedio Datos_2</td><td id="avg2_1"></td><td id="avg2_2"></td><td id="avg2_3"></td></tr>
+            <tr><td>Desv. Est. Datos_2</td><td id="std2_1"></td><td id="std2_2"></td><td id="std2_3"></td></tr>
+            <tr><td>Rango Datos_2</td><td id="range2_1"></td><td id="range2_2"></td><td id="range2_3"></td></tr>
+            <tr><td>Máximo Datos_2</td><td id="max2_1"></td><td id="max2_2"></td><td id="max2_3"></td></tr>
+            <tr><td>Mínimo Datos_2</td><td id="min2_1"></td><td id="min2_2"></td><td id="min2_3"></td></tr>
+            <tr><td>LCS Datos_2</td><td id="lcs2_1"></td><td id="lcs2_2"></td><td id="lcs2_3"></td></tr>
+            <tr><td>LCI Datos_2</td><td id="lci2_1"></td><td id="lci2_2"></td><td id="lci2_3"></td></tr>
+            <tr><td>Intervalo Confianza Sup. Datos_2</td><td id="confSup2_1"></td><td id="confSup2_2"></td><td id="confSup2_3"></td></tr>
+            <tr><td>Intervalo Confianza Inf. Datos_2</td><td id="confInf2_1"></td><td id="confInf2_2"></td><td id="confInf2_3"></td></tr>
+            <tr><td>Cp Datos_2</td><td id="cp2_1"></td><td id="cp2_2"></td><td id="cp2_3"></td></tr>
+            <tr><td>Cpk Sup Datos_2</td><td id="cpkSup2_1"></td><td id="cpkSup2_2"></td><td id="cpkSup2_3"></td></tr>
+            <tr><td>Cpk Inf Datos_2</td><td id="cpkInf2_1"></td><td id="cpkInf2_2"></td><td id="cpkInf2_3"></td></tr>
         </table>
         <textarea id="analisis" placeholder="Escribe tu análisis de la gráfica aquí..."></textarea>
     </div>
 
     <!-- Gráficas -->
-    <h2>Gráfico de Peso</h2>
+    <h2>Gráfico de Datos_1</h2>
     <canvas id="graficoPeso1" width="400" height="200"></canvas>
-    <h2>Gráfico de Uniformidad</h2>
+    <h2>Gráfico de Datos_2</h2>
     <canvas id="graficoPeso2" width="400" height="200"></canvas>
 
     <script>
