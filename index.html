@@ -4,287 +4,144 @@
     <meta charset="UTF-8">
     <title>Control de Calidad - Ingreso y Gráficos</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f7fa;
-        }
-        h1, h2 {
-            color: #333;
-            text-align: center;
-        }
-        h2 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .section {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fafafa;
-        }
-        .form-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-            justify-content: center;
-        }
-        .form-group label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.95em;
-            color: #555;
-        }
-        input[type="text"], input[type="datetime-local"], input[type="number"], select {
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-        input[type="number"] {
-            width: 60px;
-        }
-        input[type="text"], input[type="datetime-local"] {
-            width: 150px;
-        }
-        select {
-            width: 100px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #e9ecef;
-            color: #333;
-        }
-        td {
-            background-color: #fff;
-        }
-        button {
-            padding: 8px 15px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            align-items: center;
-            margin-top: 10px;
-        }
-        .result-header {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .result-header p {
-            margin: 5px 0;
-            font-size: 0.95em;
-            color: #555;
-        }
-        #analisis {
-            width: 100%;
-            height: 100px;
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9em;
-            resize: vertical;
-        }
-        canvas {
-            max-width: 100%;
-            height: auto;
-            margin: 0 auto;
-            display: block;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        input { width: 60px; text-align: center; }
+        input[type="text"], input[type="datetime-local"] { width: 150px; }
+        button { padding: 10px; margin: 5px; }
+        #resultados { margin-top: 20px; }
+        .limit-input { width: 80px; }
+        #analisis { width: 100%; height: 100px; margin-top: 10px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Control de Calidad - Tabletas Recubiertas</h1>
+    <h1>Control de Calidad - Tabletas Recubiertas</h1>
 
-        <!-- Configuración General -->
-        <div class="section">
-            <h2>Configuración General</h2>
-            <div class="form-group">
-                <label>Título de Datos: <input type="text" id="tituloDatos" value="Ingresar Datos de Peso (mg)"></label>
-                <label>Analista: <input type="text" id="analista" placeholder="Nombre del analista"></label>
-                <label>Lote: <input type="text" id="lote" placeholder="Nombre del lote"></label>
-                <label>Hora Inicio: <input type="datetime-local" id="horaInicio"></label>
-                <label>Hora Final: <input type="datetime-local" id="horaFinal"></label>
-            </div>
-        </div>
+    <!-- Configuración General -->
+    <h2>Configuración General</h2>
+    <label>Título de Datos: <input type="text" id="tituloDatos" value="Ingresar Datos de Peso (mg)"></label><br>
+    <label>Analista: <input type="text" id="analista" placeholder="Nombre del analista"></label><br>
+    <label>Lote: <input type="text" id="lote" placeholder="Nombre del lote"></label><br>
+    <label>Hora Inicio: <input type="datetime-local" id="horaInicio"></label><br>
+    <label>Hora Final: <input type="datetime-local" id="horaFinal"></label><br>
 
-        <!-- Límites de Especificación y Nivel de Confianza -->
-        <div class="section">
-            <h2>Parámetros de Control</h2>
-            <div class="form-group">
-                <label>Límite Superior (LES): <input type="number" id="les" value="116"></label>
-                <label>Límite Inferior (LEI): <input type="number" id="lei" value="107"></label>
-                <label>Nivel de Confianza: 
-                    <select id="confidenceLevel">
-                        <option value="90">90%</option>
-                        <option value="95" selected>95%</option>
-                        <option value="99">99%</option>
-                    </select>
-                </label>
-            </div>
-        </div>
+    <!-- Configuración de Límites de Especificación -->
+    <h2>Límites de Especificación</h2>
+    <label>Límite Superior (LES): <input type="number" id="les" value="116" class="limit-input"></label>
+    <label>Límite Inferior (LEI): <input type="number" id="lei" value="107" class="limit-input"></label>
 
-        <!-- Primera Sección de Ingreso de Datos -->
-        <div class="section">
-            <h2 id="tituloDatosH2">Ingresar Datos de Peso (mg)</h2>
-            <table id="tablaPeso1">
-                <thead>
-                    <tr>
-                        <th>Muestra</th>
-                        <th>Lote 1</th>
-                        <th>Lote 2</th>
-                        <th>Lote 3</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaBody1">
-                    <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>4</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>5</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>6</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>7</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>8</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>9</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                </tbody>
-            </table>
-            <div class="controls">
-                <button onclick="agregarFila(1)">Agregar Muestra (Peso)</button>
-                <label><input type="checkbox" id="mostrarLimites1" checked> Mostrar Límites de Control</label>
-            </div>
-        </div>
+    <!-- Nivel de Confianza -->
+    <h2>Nivel de Confianza para Intervalos</h2>
+    <label>Elegir nivel de confianza: 
+        <select id="confidenceLevel">
+            <option value="90">90%</option>
+            <option value="95" selected>95%</option>
+            <option value="99">99%</option>
+        </select>
+    </label>
 
-        <!-- Segunda Sección de Ingreso de Datos -->
-        <div class="section">
-            <h2>Ingresar Datos de Uniformidad (mg)</h2>
-            <table id="tablaPeso2">
-                <thead>
-                    <tr>
-                        <th>Muestra</th>
-                        <th>Lote 1</th>
-                        <th>Lote 2</th>
-                        <th>Lote 3</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaBody2">
-                    <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>4</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>5</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>6</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>7</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>8</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>9</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                    <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
-                </tbody>
-            </table>
-            <div class="controls">
-                <button onclick="agregarFila(2)">Agregar Muestra (Uniformidad)</button>
-                <label><input type="checkbox" id="mostrarLimites2" checked> Mostrar Límites de Control</label>
-            </div>
-        </div>
+    <!-- Primera Sección de Ingreso de Datos -->
+    <h2 id="tituloDatosH2">Ingresar Datos de Peso (mg)</h2>
+    <table id="tablaPeso1">
+        <thead>
+            <tr>
+                <th>Muestra</th>
+                <th>Lote 1</th>
+                <th>Lote 2</th>
+                <th>Lote 3</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBody1">
+            <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>4</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>5</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>6</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>7</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>8</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>9</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+        </tbody>
+    </table>
+    <button onclick="agregarFila(1)">Agregar Muestra (Peso)</button>
+    <label><input type="checkbox" id="mostrarLimites1" checked> Mostrar Límites de Control en el Gráfico</label>
 
-        <!-- Botón de Cálculo -->
-        <div class="section" style="text-align: center;">
-            <button onclick="calcularEstadisticas()">Calcular y Graficar</button>
-        </div>
+    <!-- Segunda Sección de Ingreso de Datos -->
+    <h2>Ingresar Datos de Uniformidad (mg)</h2>
+    <table id="tablaPeso2">
+        <thead>
+            <tr>
+                <th>Muestra</th>
+                <th>Lote 1</th>
+                <th>Lote 2</th>
+                <th>Lote 3</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBody2">
+            <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>4</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>5</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>6</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>7</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>8</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>9</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+            <tr><td>10</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
+        </tbody>
+    </table>
+    <button onclick="agregarFila(2)">Agregar Muestra (Uniformidad)</button>
+    <label><input type="checkbox" id="mostrarLimites2" checked> Mostrar Límites de Control en el Gráfico</label>
 
-        <!-- Resultados -->
-        <div class="section" id="resultados">
-            <h2>Informe de Resultados</h2>
-            <div class="result-header">
-                <p>Analista: <span id="analistaRes"></span></p>
-                <p>Lote: <span id="loteRes"></span></p>
-                <p>Hora Inicio: <span id="horaInicioRes"></span></p>
-                <p>Hora Final: <span id="horaFinalRes"></span></p>
-            </div>
-            <h3>Resultados de Peso</h3>
-            <table id="tablaResultadosPeso">
-                <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
-                <tr><td>Promedio</td><td id="avg1_1"></td><td id="avg1_2"></td><td id="avg1_3"></td></tr>
-                <tr><td>Desv. Est.</td><td id="std1_1"></td><td id="std1_2"></td><td id="std1_3"></td></tr>
-                <tr><td>Rango</td><td id="range1_1"></td><td id="range1_2"></td><td id="range1_3"></td></tr>
-                <tr><td>Máximo</td><td id="max1_1"></td><td id="max1_2"></td><td id="max1_3"></td></tr>
-                <tr><td>Mínimo</td><td id="min1_1"></td><td id="min1_2"></td><td id="min1_3"></td></tr>
-                <tr><td>LCS</td><td id="lcs1_1"></td><td id="lcs1_2"></td><td id="lcs1_3"></td></tr>
-                <tr><td>LCI</td><td id="lci1_1"></td><td id="lci1_2"></td><td id="lci1_3"></td></tr>
-                <tr><td>Intervalo Confianza Sup.</td><td id="confSup1_1"></td><td id="confSup1_2"></td><td id="confSup1_3"></td></tr>
-                <tr><td>Intervalo Confianza Inf.</td><td id="confInf1_1"></td><td id="confInf1_2"></td><td id="confInf1_3"></td></tr>
-                <tr><td>Cp</td><td id="cp1_1"></td><td id="cp1_2"></td><td id="cp1_3"></td></tr>
-                <tr><td>Cpk Sup</td><td id="cpkSup1_1"></td><td id="cpkSup1_2"></td><td id="cpkSup1_3"></td></tr>
-                <tr><td>Cpk Inf</td><td id="cpkInf1_1"></td><td id="cpkInf1_2"></td><td id="cpkInf1_3"></td></tr>
-            </table>
-            <h3>Resultados de Uniformidad</h3>
-            <table id="tablaResultadosUniformidad">
-                <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
-                <tr><td>Promedio</td><td id="avg2_1"></td><td id="avg2_2"></td><td id="avg2_3"></td></tr>
-                <tr><td>Desv. Est.</td><td id="std2_1"></td><td id="std2_2"></td><td id="std2_3"></td></tr>
-                <tr><td>Rango</td><td id="range2_1"></td><td id="range2_2"></td><td id="range2_3"></td></tr>
-                <tr><td>Máximo</td><td id="max2_1"></td><td id="max2_2"></td><td id="max2_3"></td></tr>
-                <tr><td>Mínimo</td><td id="min2_1"></td><td id="min2_2"></td><td id="min2_3"></td></tr>
-                <tr><td>LCS</td><td id="lcs2_1"></td><td id="lcs2_2"></td><td id="lcs2_3"></td></tr>
-                <tr><td>LCI</td><td id="lci2_1"></td><td id="lci2_2"></td><td id="lci2_3"></td></tr>
-                <tr><td>Intervalo Confianza Sup.</td><td id="confSup2_1"></td><td id="confSup2_2"></td><td id="confSup2_3"></td></tr>
-                <tr><td>Intervalo Confianza Inf.</td><td id="confInf2_1"></td><td id="confInf2_2"></td><td id="confInf2_3"></td></tr>
-                <tr><td>Cp</td><td id="cp2_1"></td><td id="cp2_2"></td><td id="cp2_3"></td></tr>
-                <tr><td>Cpk Sup</td><td id="cpkSup2_1"></td><td id="cpkSup2_2"></td><td id="cpkSup2_3"></td></tr>
-                <tr><td>Cpk Inf</td><td id="cpkInf2_1"></td><td id="cpkInf2_2"></td><td id="cpkInf2_3"></td></tr>
-            </table>
-            <h3>Análisis de las Gráficas</h3>
-            <textarea id="analisis" placeholder="Escribe tu análisis de las gráficas aquí..."></textarea>
-        </div>
+    <br>
+    <button onclick="calcularEstadisticas()">Calcular y Graficar</button>
 
-        <!-- Gráficas -->
-        <div class="section">
-            <h2>Gráfico de Peso</h2>
-            <canvas id="graficoPeso1"></canvas>
-        </div>
-        <div class="section">
-            <h2>Gráfico de Uniformidad</h2>
-            <canvas id="graficoPeso2"></canvas>
-        </div>
+    <!-- Resultados -->
+    <div id="resultados">
+        <h2>Resultados</h2>
+        <p>Analista: <span id="analistaRes"></span></p>
+        <p>Lote: <span id="loteRes"></span></p>
+        <p>Hora Inicio: <span id="horaInicioRes"></span></p>
+        <p>Hora Final: <span id="horaFinalRes"></span></p>
+        <table id="tablaResultados">
+            <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
+            <tr><td>Promedio (Peso)</td><td id="avg1_1"></td><td id="avg1_2"></td><td id="avg1_3"></td></tr>
+            <tr><td>Desv. Est. (Peso)</td><td id="std1_1"></td><td id="std1_2"></td><td id="std1_3"></td></tr>
+            <tr><td>Rango (Peso)</td><td id="range1_1"></td><td id="range1_2"></td><td id="range1_3"></td></tr>
+            <tr><td>Máximo (Peso)</td><td id="max1_1"></td><td id="max1_2"></td><td id="max1_3"></td></tr>
+            <tr><td>Mínimo (Peso)</td><td id="min1_1"></td><td id="min1_2"></td><td id="min1_3"></td></tr>
+            <tr><td>LCS (Peso)</td><td id="lcs1_1"></td><td id="lcs1_2"></td><td id="lcs1_3"></td></tr>
+            <tr><td>LCI (Peso)</td><td id="lci1_1"></td><td id="lci1_2"></td><td id="lci1_3"></td></tr>
+            <tr><td>Intervalo Confianza Sup. (Peso)</td><td id="confSup1_1"></td><td id="confSup1_2"></td><td id="confSup1_3"></td></tr>
+            <tr><td>Intervalo Confianza Inf. (Peso)</td><td id="confInf1_1"></td><td id="confInf1_2"></td><td id="confInf1_3"></td></tr>
+            <tr><td>Cp (Peso)</td><td id="cp1_1"></td><td id="cp1_2"></td><td id="cp1_3"></td></tr>
+            <tr><td>Cpk Sup (Peso)</td><td id="cpkSup1_1"></td><td id="cpkSup1_2"></td><td id="cpkSup1_3"></td></tr>
+            <tr><td>Cpk Inf (Peso)</td><td id="cpkInf1_1"></td><td id="cpkInf1_2"></td><td id="cpkInf1_3"></td></tr>
+            <tr><td>Promedio (Uniformidad)</td><td id="avg2_1"></td><td id="avg2_2"></td><td id="avg2_3"></td></tr>
+            <tr><td>Desv. Est. (Uniformidad)</td><td id="std2_1"></td><td id="std2_2"></td><td id="std2_3"></td></tr>
+            <tr><td>Rango (Uniformidad)</td><td id="range2_1"></td><td id="range2_2"></td><td id="range2_3"></td></tr>
+            <tr><td>Máximo (Uniformidad)</td><td id="max2_1"></td><td id="max2_2"></td><td id="max2_3"></td></tr>
+            <tr><td>Mínimo (Uniformidad)</td><td id="min2_1"></td><td id="min2_2"></td><td id="min2_3"></td></tr>
+            <tr><td>LCS (Uniformidad)</td><td id="lcs2_1"></td><td id="lcs2_2"></td><td id="lcs2_3"></td></tr>
+            <tr><td>LCI (Uniformidad)</td><td id="lci2_1"></td><td id="lci2_2"></td><td id="lci2_3"></td></tr>
+            <tr><td>Intervalo Confianza Sup. (Uniformidad)</td><td id="confSup2_1"></td><td id="confSup2_2"></td><td id="confSup2_3"></td></tr>
+            <tr><td>Intervalo Confianza Inf. (Uniformidad)</td><td id="confInf2_1"></td><td id="confInf2_2"></td><td id="confInf2_3"></td></tr>
+            <tr><td>Cp (Uniformidad)</td><td id="cp2_1"></td><td id="cp2_2"></td><td id="cp2_3"></td></tr>
+            <tr><td>Cpk Sup (Uniformidad)</td><td id="cpkSup2_1"></td><td id="cpkSup2_2"></td><td id="cpkSup2_3"></td></tr>
+            <tr><td>Cpk Inf (Uniformidad)</td><td id="cpkInf2_1"></td><td id="cpkInf2_2"></td><td id="cpkInf2_3"></td></tr>
+        </table>
+        <textarea id="analisis" placeholder="Escribe tu análisis de la gráfica aquí..."></textarea>
     </div>
+
+    <!-- Gráficas -->
+    <h2>Gráfico de Peso</h2>
+    <canvas id="graficoPeso1" width="400" height="200"></canvas>
+    <h2>Gráfico de Uniformidad</h2>
+    <canvas id="graficoPeso2" width="400" height="200"></canvas>
 
     <script>
         let chart1, chart2;
@@ -337,18 +194,8 @@
                     const inputs = filas[i].getElementsByTagName('input');
                     for (let j = 0; j < 3; j++) {
                         const valor = parseFloat(inputs[j].value) || 0;
-                        if (valor !== 0) datos[j].push(valor); // Solo incluir valores válidos
+                        if (valor !== 0) datos[j].push(valor);
                     }
-                }
-
-                // Verificar si hay datos válidos antes de procesar
-                if (datos.every(lote => lote.length === 0)) {
-                    console.log(`No hay datos válidos para la tabla ${index + 1}. Omitiendo gráfico.`);
-                    if (window[`chart${index + 1}`]) {
-                        window[`chart${index + 1}`].destroy();
-                        window[`chart${index + 1}`] = null;
-                    }
-                    return;
                 }
 
                 const resultados = datos.map((lote, i) => {
@@ -358,15 +205,15 @@
                     const max = Math.max(...lote);
                     const min = Math.min(...lote);
                     const range = max - min;
-                    const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1) || 0);
+                    const std = Math.sqrt(lote.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / (lote.length - 1));
                     const lcs = avg + 3 * std;
                     const lci = avg - 3 * std;
-                    const errorStd = std / Math.sqrt(lote.length) || 0;
+                    const errorStd = std / Math.sqrt(lote.length);
                     const confSup = avg + zScore * errorStd;
                     const confInf = avg - zScore * errorStd;
-                    const cp = (les - lei) / (6 * std) || 0;
-                    const cpkSup = (les - avg) / (3 * std) || 0;
-                    const cpkInf = (avg - lei) / (3 * std) || 0;
+                    const cp = (les - lei) / (6 * std);
+                    const cpkSup = (les - avg) / (3 * std);
+                    const cpkInf = (avg - lei) / (3 * std);
 
                     return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
                 });
@@ -402,30 +249,24 @@
                     document.getElementById(`cpkInf${tabla.prefix}${i+1}`).textContent = res.cpkInf.toFixed(2);
                 }
 
-                // Renderizar gráfico solo si hay datos válidos
+                // Generar gráfico
                 if (window[`chart${index + 1}`]) window[`chart${index + 1}`].destroy();
                 const ctx = document.getElementById(tabla.graficoId).getContext('2d');
                 const mostrarLimites = document.getElementById(tabla.mostrarLimitesId).checked;
 
-                const datasets = [];
-                datos.forEach((lote, i) => {
-                    if (lote.length > 0) {
-                        datasets.push({
-                            label: `Lote ${i+1} (${index === 0 ? 'Peso' : 'Uniformidad'})`,
-                            data: lote,
-                            borderColor: ['red', 'blue', 'green'][i],
-                            fill: false
-                        });
-                    }
-                });
+                const datasets = [
+                    { label: `Lote 1 (${index === 0 ? 'Peso' : 'Uniformidad'})`, data: datos[0], borderColor: 'red', fill: false },
+                    { label: `Lote 2 (${index === 0 ? 'Peso' : 'Uniformidad'})`, data: datos[1], borderColor: 'blue', fill: false },
+                    { label: `Lote 3 (${index === 0 ? 'Peso' : 'Uniformidad'})`, data: datos[2], borderColor: 'green', fill: false }
+                ];
 
-                if (mostrarLimites && resultados.some(res => res !== null)) {
+                if (mostrarLimites) {
                     resultados.forEach((res, i) => {
-                        if (res && datos[i].length > 0) {
+                        if (res) {
                             datasets.push({
                                 label: `LCS Lote ${i+1} (${index === 0 ? 'Peso' : 'Uniformidad'})`,
                                 data: Array(datos[i].length).fill(res.lcs),
-                                borderColor: ['red', 'blue', 'green'][i],
+                                borderColor: datasets[i].borderColor,
                                 borderDash: [5, 5],
                                 fill: false,
                                 pointRadius: 0
@@ -433,7 +274,7 @@
                             datasets.push({
                                 label: `LCI Lote ${i+1} (${index === 0 ? 'Peso' : 'Uniformidad'})`,
                                 data: Array(datos[i].length).fill(res.lci),
-                                borderColor: ['red', 'blue', 'green'][i],
+                                borderColor: datasets[i].borderColor,
                                 borderDash: [5, 5],
                                 fill: false,
                                 pointRadius: 0
@@ -442,28 +283,23 @@
                     });
                 }
 
-                if (datasets.length > 0) {
-                    window[`chart${index + 1}`] = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: Array.from({ length: Math.max(...datos.map(d => d.length)) }, (_, i) => `Muestra ${i+1}`),
-                            datasets: datasets
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: { beginAtZero: false }
-                            }
+                window[`chart${index + 1}`] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({ length: Math.max(...datos.map(d => d.length)) }, (_, i) => `Muestra ${i+1}`),
+                        datasets: datasets
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: false }
                         }
-                    });
-                } else {
-                    window[`chart${index + 1}`] = null;
-                }
+                    }
+                });
             });
 
+            // Mostrar análisis
             const analisis = document.getElementById('analisis').value || 'Sin análisis';
-            document.getElementById('analisis').value = analisis;
+            document.getElementById('analisis').value = analisis; // Mantener el valor
         }
     </script>
 </body>
