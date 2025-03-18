@@ -47,7 +47,7 @@
 
     <!-- Primera Sección de Ingreso de Datos -->
     <h2 id="tituloDatosH2">Ingresar Datos de Datos_1</h2>
-    <table id="tablaPeso1">
+    <table id="tablaDatos1">
         <thead>
             <tr>
                 <th>Muestra</th>
@@ -57,7 +57,6 @@
             </tr>
         </thead>
         <tbody id="tablaBody1">
-            <!-- Filas iniciales permanecen iguales -->
             <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
             <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
             <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
@@ -74,7 +73,7 @@
     <label><input type="checkbox" id="mostrarLimites1" checked> Mostrar Límites de Control en el Gráfico</label>
 
     <!-- Segunda Sección de Ingreso de Datos -->
-    <h2>Ingresar Datos 2 </h2>
+    <h2>Ingresar Datos_2 </h2>
     <table id="tabla2">
         <thead>
             <tr>
@@ -85,7 +84,6 @@
             </tr>
         </thead>
         <tbody id="tablaBody2">
-            <!-- Filas iniciales permanecen iguales -->
             <tr><td>1</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
             <tr><td>2</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
             <tr><td>3</td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td><td><input type="number" step="0.1"></td></tr>
@@ -113,7 +111,6 @@
         <p>Hora Inicio: <span id="horaInicioRes"></span></p>
         <p>Hora Final: <span id="horaFinalRes"></span></p>
         <table id="tablaResultados">
-            <!-- Estructura de la tabla de resultados permanece igual -->
             <tr><th>Estadístico</th><th>Lote 1</th><th>Lote 2</th><th>Lote 3</th></tr>
             <tr><td>Promedio Datos_1</td><td id="avg1_1"></td><td id="avg1_2"></td><td id="avg1_3"></td></tr>
             <tr><td>Desv. Est. Datos_1</td><td id="std1_1"></td><td id="std1_2"></td><td id="std1_3"></td></tr>
@@ -145,9 +142,9 @@
 
     <!-- Gráficas -->
     <h2>Gráfico de Datos_1</h2>
-    <canvas id="graficoPeso1" width="400" height="200"></canvas>
+    <canvas id="graficoDatos1" width="400" height="200"></canvas>
     <h2>Gráfico de Datos_2</h2>
-    <canvas id="graficoPeso2" width="400" height="200"></canvas>
+    <canvas id="graficoDatos2" width="400" height="200"></canvas>
 
     <script>
         let chart1, chart2;
@@ -194,8 +191,8 @@
                 const zScore = confidenceLevel === 90 ? 1.645 : confidenceLevel === 95 ? 1.96 : 2.576;
 
                 const tablas = [
-                    { id: 'tablaPeso1', bodyId: 'tablaBody1', mostrarLimitesId: 'mostrarLimites1', graficoId: 'graficoPeso1', prefix: '1_' },
-                    { id: 'tablaPeso2', bodyId: 'tablaBody2', mostrarLimitesId: 'mostrarLimites2', graficoId: 'graficoPeso2', prefix: '2_' }
+                    { id: 'tablaDatos1', bodyId: 'tablaBody1', mostrarLimitesId: 'mostrarLimites1', graficoId: 'graficoDatos1', prefix: '1_' },
+                    { id: 'tabla2', bodyId: 'tablaBody2', mostrarLimitesId: 'mostrarLimites2', graficoId: 'graficoDatos2', prefix: '2_' }
                 ];
 
                 let hasData = false;
@@ -268,9 +265,9 @@
                     const mostrarLimites = document.getElementById(tabla.mostrarLimitesId).checked;
 
                     const datasets = [
-                        { label: `Lote 1 (${index === 0 ? 'Peso' : 'Uniformidad'})`, data: datos[0], borderColor: 'red', fill: false },
-                        { label: `Lote 2 (${index === 0 ? 'Peso' : 'Uniformidad'})`, data: datos[1], borderColor: 'blue', fill: false },
-                        { label: `Lote 3 (${index === 0 ? 'Peso' : 'Uniformidad'})`, data: datos[2], borderColor: 'green', fill: false }
+                        { label: `Lote 1 (${index === 0 ? 'Datos_1' : 'Datos_2'})`, data: datos[0], borderColor: 'red', fill: false },
+                        { label: `Lote 2 (${index === 0 ? 'Datos_1' : 'Datos_2'})`, data: datos[1], borderColor: 'blue', fill: false },
+                        { label: `Lote 3 (${index === 0 ? 'Datos_1' : 'Datos_2'})`, data: datos[2], borderColor: 'green', fill: false }
                     ];
 
                     if (mostrarLimites) {
