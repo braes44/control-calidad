@@ -26,4 +26,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .
           publish_branch: main
-          force_orphan: false  # No forzamos un historial limpio para evitar conflictos
+          force_orphan: false
