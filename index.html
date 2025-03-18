@@ -31,9 +31,15 @@
 
     <!-- Configuración de Límites de Especificación -->
     <h2>Límites de Especificación</h2>
-    <label>Límite Superior (LES): <input type="number" id="les" value="116" class="limit-input" required></label>
-    <label>Límite Inferior (LEI): <input type="number" id="lei" value="107" class="limit-input" required></label>
-    <div id="errorLimites" class="error"></div>
+    <h3>Datos_1</h3>
+    <label>Límite Superior (LES): <input type="number" id="les1" value="116" class="limit-input" required></label>
+    <label>Límite Inferior (LEI): <input type="number" id="lei1" value="107" class="limit-input" required></label>
+    <div id="errorLimites1" class="error"></div>
+    
+    <h3>Datos_2</h3>
+    <label>Límite Superior (LES): <input type="number" id="les2" value="120" class="limit-input" required></label>
+    <label>Límite Inferior (LEI): <input type="number" id="lei2" value="110" class="limit-input" required></label>
+    <div id="errorLimites2" class="error"></div>
 
     <!-- Nivel de Confianza -->
     <h2>Nivel de Confianza para Intervalos</h2>
@@ -178,21 +184,32 @@
                 document.getElementById('horaInicioRes').textContent = horaInicio;
                 document.getElementById('horaFinalRes').textContent = horaFinal;
 
-                const les = parseFloat(document.getElementById('les').value);
-                const lei = parseFloat(document.getElementById('lei').value);
-                if (isNaN(les) || isNaN(lei) || les <= lei) {
-                    document.getElementById('errorLimites').textContent = 
-                        'Error: Verifique que LES sea mayor que LEI y ambos sean números válidos';
+                // Límites de especificación para Datos_1
+                const les1 = parseFloat(document.getElementById('les1').value);
+                const lei1 = parseFloat(document.getElementById('lei1').value);
+                if (isNaN(les1) || isNaN(lei1) || les1 <= lei1) {
+                    document.getElementById('errorLimites1').textContent = 
+                        'Error: Verifique que LES sea mayor que LEI para Datos_1 y ambos sean números válidos';
                     return;
                 }
-                document.getElementById('errorLimites').textContent = '';
+                document.getElementById('errorLimites1').textContent = '';
+
+                // Límites de especificación para Datos_2
+                const les2 = parseFloat(document.getElementById('les2').value);
+                const lei2 = parseFloat(document.getElementById('lei2').value);
+                if (isNaN(les2) || isNaN(lei2) || les2 <= lei2) {
+                    document.getElementById('errorLimites2').textContent = 
+                        'Error: Verifique que LES sea mayor que LEI para Datos_2 y ambos sean números válidos';
+                    return;
+                }
+                document.getElementById('errorLimites2').textContent = '';
 
                 const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value);
                 const zScore = confidenceLevel === 90 ? 1.645 : confidenceLevel === 95 ? 1.96 : 2.576;
 
                 const tablas = [
-                    { id: 'tablaDatos1', bodyId: 'tablaBody1', mostrarLimitesId: 'mostrarLimites1', graficoId: 'graficoDatos1', prefix: '1_' },
-                    { id: 'tabla2', bodyId: 'tablaBody2', mostrarLimitesId: 'mostrarLimites2', graficoId: 'graficoDatos2', prefix: '2_' }
+                    { id: 'tablaDatos1', bodyId: 'tablaBody1', mostrarLimitesId: 'mostrarLimites1', graficoId: 'graficoDatos1', prefix: '1_', les: les1, lei: lei1 },
+                    { id: 'tabla2', bodyId: 'tablaBody2', mostrarLimitesId: 'mostrarLimites2', graficoId: 'graficoDatos2', prefix: '2_', les: les2, lei: lei2 }
                 ];
 
                 let hasData = false;
@@ -230,9 +247,10 @@
                         const errorStd = std / Math.sqrt(lote.length);
                         const confSup = avg + zScore * errorStd;
                         const confInf = avg - zScore * errorStd;
-                        const cp = (les - lei) / (6 * std);
-                        const cpkSup = (les - avg) / (3 * std);
-                        const cpkInf = (avg - lei) / (3 * std);
+                        // Usar los límites específicos de esta tabla
+                        const cp = (tabla.les - tabla.lei) / (6 * std);
+                        const cpkSup = (tabla.les - avg) / (3 * std);
+                        const cpkInf = (avg - tabla.lei) / (3 * std);
 
                         return { avg, std, range, max, min, lcs, lci, confSup, confInf, cp, cpkSup, cpkInf };
                     });
