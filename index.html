@@ -107,6 +107,8 @@
 
     <br>
     <button onclick="calcularEstadisticas()">Calcular y Graficar</button>
+    <button onclick="exportarCSV()">Exportar a CSV</button>
+    <label>Cargar CSV: <input type="file" id="cargarCSV" accept=".csv" onchange="cargarCSV(event)"></label>
     <div id="errorDatos" class="error"></div>
 
     <!-- Resultados -->
@@ -184,7 +186,6 @@
                 document.getElementById('horaInicioRes').textContent = horaInicio;
                 document.getElementById('horaFinalRes').textContent = horaFinal;
 
-                // Límites de especificación para Datos_1
                 const les1 = parseFloat(document.getElementById('les1').value);
                 const lei1 = parseFloat(document.getElementById('lei1').value);
                 if (isNaN(les1) || isNaN(lei1) || les1 <= lei1) {
@@ -194,7 +195,6 @@
                 }
                 document.getElementById('errorLimites1').textContent = '';
 
-                // Límites de especificación para Datos_2
                 const les2 = parseFloat(document.getElementById('les2').value);
                 const lei2 = parseFloat(document.getElementById('lei2').value);
                 if (isNaN(les2) || isNaN(lei2) || les2 <= lei2) {
@@ -247,7 +247,6 @@
                         const errorStd = std / Math.sqrt(lote.length);
                         const confSup = avg + zScore * errorStd;
                         const confInf = avg - zScore * errorStd;
-                        // Usar los límites específicos de esta tabla
                         const cp = (tabla.les - tabla.lei) / (6 * std);
                         const cpkSup = (tabla.les - avg) / (3 * std);
                         const cpkInf = (avg - tabla.lei) / (3 * std);
@@ -277,7 +276,6 @@
                         document.getElementById(`cpkInf${prefix}`).textContent = res.cpkInf.toFixed(2);
                     }
 
-                    // Generar gráfico
                     if (window[`chart${index + 1}`]) window[`chart${index + 1}`].destroy();
                     const ctx = document.getElementById(tabla.graficoId).getContext('2d');
                     const mostrarLimites = document.getElementById(tabla.mostrarLimitesId).checked;
@@ -326,6 +324,144 @@
                 });
             } catch (error) {
                 document.getElementById('errorDatos').textContent = `Error al procesar los datos: ${error.message}`;
+            }
+        }
+
+        function exportarCSV() {
+            try {
+                let csvContent = "data:text/csv;charset=utf-8,";
+
+                // Configuración general
+                csvContent += "Configuración General\n";
+                csvContent += `Título de Datos,${document.getElementById('tituloDatos').value}\n`;
+                csvContent += `Analista,${document.getElementById('analista').value}\n`;
+                csvContent += `Lote,${document.getElementById('lote').value}\n`;
+                csvContent += `Hora Inicio,${document.getElementById('horaInicio').value}\n`;
+                csvContent += `Hora Final,${document.getElementById('horaFinal').value}\n`;
+                csvContent += `LES Datos_1,${document.getElementById('les1').value}\n`;
+                csvContent += `LEI Datos_1,${document.getElementById('lei1').value}\n`;
+                csvContent += `LES Datos_2,${document.getElementById('les2').value}\n`;
+                csvContent += `LEI Datos_2,${document.getElementById('lei2').value}\n`;
+                csvContent += `Nivel de Confianza,${document.getElementById('confidenceLevel').value}\n\n`;
+
+                // Datos_1
+                csvContent += "Datos_1\n";
+                csvContent += "Muestra,Lote 1,Lote 2,Lote 3\n";
+                const filas1 = document.getElementById('tablaBody1').getElementsByTagName('tr');
+                for (let i = 0; i < filas1.length; i++) {
+                    const inputs = filas1[i].getElementsByTagName('input');
+                    const valores = [i + 1];
+                    for (let j = 0; j < 3; j++) {
+                        valores.push(inputs[j].value || '');
+                    }
+                    csvContent += valores.join(',') + '\n';
+                }
+
+                // Datos_2
+                csvContent += "\nDatos_2\n";
+                csvContent += "Muestra,Lote 1,Lote 2,Lote 3\n";
+                const filas2 = document.getElementById('tablaBody2').getElementsByTagName('tr');
+                for (let i = 0; i < filas2.length; i++) {
+                    const inputs = filas2[i].getElementsByTagName('input');
+                    const valores = [i + 1];
+                    for (let j = 0; j < 3; j++) {
+                        valores.push(inputs[j].value || '');
+                    }
+                    csvContent += valores.join(',') + '\n';
+                }
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'control_calidad_datos.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                document.getElementById('errorDatos').textContent = `Error al exportar CSV: ${error.message}`;
+            }
+        }
+
+        function cargarCSV(event) {
+            try {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    const rows = text.split('\n').map(row => row.trim().split(','));
+
+                    let section = '';
+                    let datos1 = [];
+                    let datos2 = [];
+
+                    for (let i = 0; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (row[0] === 'Configuración General') {
+                            section = 'config';
+                            continue;
+                        } else if (row[0] === 'Datos_1') {
+                            section = 'datos1';
+                            i++; // Saltar encabezado
+                            continue;
+                        } else if (row[0] === 'Datos_2') {
+                            section = 'datos2';
+                            i++; // Saltar encabezado
+                            continue;
+                        }
+
+                        if (section === 'config' && row[0]) {
+                            switch (row[0]) {
+                                case 'Título de Datos': document.getElementById('tituloDatos').value = row[1] || ''; break;
+                                case 'Analista': document.getElementById('analista').value = row[1] || ''; break;
+                                case 'Lote': document.getElementById('lote').value = row[1] || ''; break;
+                                case 'Hora Inicio': document.getElementById('horaInicio').value = row[1] || ''; break;
+                                case 'Hora Final': document.getElementById('horaFinal').value = row[1] || ''; break;
+                                case 'LES Datos_1': document.getElementById('les1').value = row[1] || ''; break;
+                                case 'LEI Datos_1': document.getElementById('lei1').value = row[1] || ''; break;
+                                case 'LES Datos_2': document.getElementById('les2').value = row[1] || ''; break;
+                                case 'LEI Datos_2': document.getElementById('lei2').value = row[1] || ''; break;
+                                case 'Nivel de Confianza': document.getElementById('confidenceLevel').value = row[1] || '95'; break;
+                            }
+                        } else if (section === 'datos1' && row[0]) {
+                            datos1.push(row.slice(1));
+                        } else if (section === 'datos2' && row[0]) {
+                            datos2.push(row.slice(1));
+                        }
+                    }
+
+                    // Actualizar Datos_1
+                    const tbody1 = document.getElementById('tablaBody1');
+                    tbody1.innerHTML = '';
+                    numMuestras1 = datos1.length;
+                    datos1.forEach((fila, i) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${i + 1}</td>
+                            <td><input type="number" step="0.1" value="${fila[0] || ''}"></td>
+                            <td><input type="number" step="0.1" value="${fila[1] || ''}"></td>
+                            <td><input type="number" step="0.1" value="${fila[2] || ''}"></td>`;
+                        tbody1.appendChild(tr);
+                    });
+
+                    // Actualizar Datos_2
+                    const tbody2 = document.getElementById('tablaBody2');
+                    tbody2.innerHTML = '';
+                    numMuestras2 = datos2.length;
+                    datos2.forEach((fila, i) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${i + 1}</td>
+                            <td><input type="number" step="0.1" value="${fila[0] || ''}"></td>
+                            <td><input type="number" step="0.1" value="${fila[1] || ''}"></td>
+                            <td><input type="number" step="0.1" value="${fila[2] || ''}"></td>`;
+                        tbody2.appendChild(tr);
+                    });
+
+                    document.getElementById('errorDatos').textContent = 'Datos cargados correctamente. Haz clic en "Calcular y Graficar" para actualizar.';
+                };
+                reader.readAsText(file);
+            } catch (error) {
+                document.getElementById('errorDatos').textContent = `Error al cargar CSV: ${error.message}`;
             }
         }
     </script>
